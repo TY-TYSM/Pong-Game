@@ -11,6 +11,7 @@ public class Pong extends JFrame {
 	
 	
 	
+	
 	public Pong() {
     	setTitle(WINDOW_TITLE);
 setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -31,6 +32,8 @@ setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
           }
  
         });
+        
+        
  
     }
 	
