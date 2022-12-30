@@ -14,6 +14,7 @@ import java.awt.BasicStroke;
 
 public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	
+	private final static int BALL_MOVEMENT_SPEED = 2;
 	private final static Color BACKGROUND_COLOR = Color.BLACK;
 	private final static int TIMER_DELAY = 5;
 	GameState gameState = GameState.INITIALISING;
@@ -26,16 +27,55 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 		  ball = new Ball(getWidth(), getHeight());
 		  paddle1 = new Paddle(getWidth(), getHeight(), Player.One);
 		  paddle2 = new Paddle(getWidth(), getHeight(), Player.Two);
-				  // int panelWidth, int panelHeight, Player player
+				  
 		   }
+	
+	private void moveObject(Sprite obj) {
+		
+		obj.setXPosition(obj.getXPosition() + obj.getXVelocity(),getWidth());
+		obj.setYPosition(obj.getYPosition() + obj.getYVelocity(),getWidth());
+		
+	}
+	
+	private void checkWallBounce() {
+		if(ball.getXPosition() <= 0) {
+	           // Hit left side of screen
+	           ball.setXVelocity(-ball.getXVelocity());
+	       } else if(ball.getXPosition() >= getWidth() - ball.getWidth()) {
+	           // Hit right side of screen
+	           ball.setXVelocity(-ball.getXVelocity());
+	       }
+	       if(ball.getYPosition() <= 0 || ball.getYPosition() >= getHeight() - ball.getHeight()) {
+	           // Hit top or bottom of screen
+	           ball.setYVelocity(-ball.getYVelocity());
+		
+	}
+	}
+	
+	private void checkPaddleBounce() {
+		if(ball.getXVelocity() < 0 && ball.getRectangle().intersects(paddle1.getRectangle())) {
+			ball.setXVelocity(BALL_MOVEMENT_SPEED);
+			     }
+			      if(ball.getXVelocity() > 0 && ball.getRectangle().intersects(paddle2.getRectangle())) {
+			          ball.setXVelocity(-BALL_MOVEMENT_SPEED);
+			      }
+		
+	}
 	private void update() {
 			switch(gameState) {
 			case INITIALISING: {
 				createObjects();
 				gameState = GameState.PLAYING;
+				ball.setXVelocity(BALL_MOVEMENT_SPEED);
+	            ball.setYVelocity(BALL_MOVEMENT_SPEED);
 				break;
 			}
 			case PLAYING: {
+				moveObject(paddle1);
+				moveObject(paddle2);
+				moveObject(ball);            // Move ball
+	              checkWallBounce();            // Check for wall bounce
+	              checkPaddleBounce();
 				break;
 			}
 			case GAMEOVER: {
@@ -51,9 +91,10 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	
 	public PongPanel() {
 		 setBackground(BACKGROUND_COLOR);
-		 
 		 Timer timer = new Timer(TIMER_DELAY, this);
 		 timer.start();
+		 addKeyListener(this);
+		 setFocusable(true);
 	}
 	
 	private void paintDottedLine(Graphics g) {
@@ -85,13 +126,27 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent event) {
-		// TODO Auto-generated method stub
+		 if(event.getKeyCode() == KeyEvent.VK_UP) {
+			 paddle2.setYVelocity(-1);
+			} else if(event.getKeyCode() == KeyEvent.VK_DOWN) {
+				paddle2.setYVelocity(1);
+			             }
+		 if(event.getKeyCode() == KeyEvent.VK_W) {
+			 paddle1.setYVelocity(-1);
+			} else if(event.getKeyCode() == KeyEvent.VK_S) {
+				paddle1.setYVelocity(1);
+			             }
 		
 	}
 
 	@Override
 	public void keyReleased(KeyEvent event) {
-		// TODO Auto-generated method stub
+		if(event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) {
+			              paddle2.setYVelocity(0);
+		}
+		if(event.getKeyCode() == KeyEvent.VK_W || event.getKeyCode() == KeyEvent.VK_S) {
+            paddle1.setYVelocity(0);
+}
 		
 	}
 
